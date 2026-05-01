@@ -3,6 +3,7 @@ local scriptCode = loadstring(game:HttpGet("https://raw.githubusercontent.com/bo
 if queue_on_teleport then
     queue_on_teleport(scriptCode)
 end
+print("Suc")
 local Players = game.Players
 local Player = Players.LocalPlayer
 local PlayerScripts = Player:WaitForChild("PlayerScripts", 5)
