@@ -1,0 +1,50 @@
+local Players = game.Players
+local Player = Players.LocalPlayer
+local PlayerScripts = Player:WaitForChild("PlayerScripts", 5)
+local env = getsenv(PlayerScripts.Client)
+env._G.GameLoaded = true
+
+local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+if playerGui:FindFirstChild("LoadingScreen") then
+	playerGui:FindFirstChild("LoadingScreen").Enabled = false
+end
+repeat 
+    task.wait(0.5)
+    print("ยังโหลดอยู่...")
+until not playerGui:FindFirstChild("LoadingScreen")
+
+local LastName = env._G.PlayerData.LastName
+local Rs = game:GetService("ReplicatedStorage")
+local Remotes = Rs:WaitForChild("Remotes")
+local Rm_Sync = Remotes:WaitForChild("Sync")
+
+getgenv().RandomRolls = {
+	LastName = "Kamado",
+	Status = true
+}
+
+local Colletion = {}
+function Colletion:Rejoid()
+	local ts = game:GetService("TeleportService")
+	local p = game:GetService("Players").LocalPlayer
+	ts:Teleport(game.PlaceId, p)
+end
+task.spawn(function()
+	while getgenv().RandomRolls.Status do
+		pcall(function()
+			if LastName ~= getgenv().RandomRolls.LastName then
+				Rm_Sync:InvokeServer("Character","Customization","Eyes",workspace)
+				local ChanceRolls = env._G.PlayerData.FamilyRolls
+				if ChanceRolls > 0 then
+					Rm_Sync:InvokeServer("Character","Customization","LastName")
+					task.wait(1)
+				else
+					Colletion:Rejoid()
+				end
+			else
+				Rm_Sync:InvokeServer("Character","Customization","Eyes",1)
+			end
+		end)
+		task.wait()
+	end
+end)
