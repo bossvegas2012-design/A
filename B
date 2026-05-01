@@ -7,7 +7,7 @@ local Players = game.Players
 local Player = Players.LocalPlayer
 local PlayerScripts = Player:WaitForChild("PlayerScripts", 5)
 local env = getsenv(PlayerScripts.Client)
-env._G.GameLoaded = true
+
 
 local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 if playerGui:FindFirstChild("LoadingScreen") then
@@ -37,6 +37,7 @@ end
 task.spawn(function()
 	while getgenv().RandomRolls.Status do
 		pcall(function()
+			env._G.GameLoaded = true
 			if LastName ~= getgenv().RandomRolls.LastName then
 				Rm_Sync:InvokeServer("Character","Customization","Eyes",workspace)
 				local ChanceRolls = env._G.PlayerData.FamilyRolls
