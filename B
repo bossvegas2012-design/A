@@ -14,9 +14,24 @@ local playerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui
 if playerGui:FindFirstChild("LoadingScreen") then
 	playerGui:FindFirstChild("LoadingScreen").Enabled = false
 end
+local VIM = game:GetService("VirtualInputManager")
+local camera = workspace.CurrentCamera
+
+-- ฟังก์ชันสำหรับคลิกกลางจอ
+local function VirtualClick()
+    local x = camera.ViewportSize.X / 2
+    local y = camera.ViewportSize.Y / 2
+    
+    -- SendMouseButtonEvent(x, y, ปุ่มเมาส์, กดลงหรือปล่อย, วัตถุที่คลิก, รหัสการคลิก)
+    -- ปุ่มเมาส์: 0 คือ ซ้าย, 1 คือ ขวา, 2 คือ กลาง
+    VIM:SendMouseButtonEvent(x, y, 0, true, game, 0)  -- กดลง (Press)
+    task.wait(0.05)
+    VIM:SendMouseButtonEvent(x, y, 0, false, game, 0) -- ปล่อย (Release)
+end
 repeat 
     task.wait(0.5)
     print("ยังโหลดอยู่...")
+	VirtualClick()
 until not playerGui:FindFirstChild("LoadingScreen")
 
 local LastName = env._G.PlayerData.LastName
