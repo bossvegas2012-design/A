@@ -30,7 +30,7 @@ local function VirtualClick()
 end
 repeat 
     task.wait(0.5)
-    print("ยังโหลดอยู่...")
+    print("ยังโหลดอยู่...กดอยู่")
 	VirtualClick()
 until not playerGui:FindFirstChild("LoadingScreen")
 
