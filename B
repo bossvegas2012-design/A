@@ -71,3 +71,10 @@ task.spawn(function()
 		task.wait()
 	end
 end)
+
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    print("AFK")
+    VirtualUser:ClickButton2(Vector2.new(0,0))
+end)
+
