@@ -34,7 +34,7 @@ repeat
 	VirtualClick()
 until not playerGui:FindFirstChild("LoadingScreen")
 
-local LastName = env._G.PlayerData.LastName
+
 local Rs = game:GetService("ReplicatedStorage")
 local Remotes = Rs:WaitForChild("Remotes")
 local Rm_Sync = Remotes:WaitForChild("Sync")
@@ -54,6 +54,7 @@ task.spawn(function()
 	while getgenv().RandomRolls.Status do
 		pcall(function()
 			env._G.GameLoaded = true
+			local LastName = env._G.PlayerData.LastName
 			if LastName ~= getgenv().RandomRolls.LastName then
 				Rm_Sync:InvokeServer("Character","Customization","Eyes",workspace)
 				local ChanceRolls = env._G.PlayerData.FamilyRolls
