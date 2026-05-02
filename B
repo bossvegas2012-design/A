@@ -28,6 +28,13 @@ local function VirtualClick()
     task.wait(0.05)
     VIM:SendMouseButtonEvent(x, y, 0, false, game, 0) -- ปล่อย (Release)
 end
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    print("AFK")
+	VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new(0,0))
+end)
+
 repeat 
     task.wait(0.5)
     print("ยังโหลดอยู่...กดอยู่")
@@ -72,12 +79,6 @@ task.spawn(function()
 	end
 end)
 
-local VirtualUser = game:GetService("VirtualUser")
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    print("AFK")
-	VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new(0,0))
-end)
 
 
 
