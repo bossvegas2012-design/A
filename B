@@ -51,11 +51,24 @@ function Colletion:Rejoid()
 	local p = game:GetService("Players").LocalPlayer
 	ts:Teleport(game.PlaceId, p)
 end
+local function appendfile(path, newContent)
+    local existing = ""
+    
+    -- ถ้าไฟล์มีอยู่แล้ว ให้อ่านก่อน
+    if isfile(path) then
+        existing = readfile(path)
+    end
+    
+    -- ต่อเนื้อหาใหม่แล้วเขียนทับ
+    writefile(path, existing .. newContent .. "\n")
+end
+
 task.spawn(function()
 	while getgenv().RandomRolls.Status do
 		pcall(function()
 			env._G.GameLoaded = true
 			local LastName = env._G.PlayerData.LastName
+			appendfile("log.txt", LastName)
 			if LastName ~= getgenv().RandomRolls.LastName then
 				Rm_Sync:InvokeServer("Character","Customization","Eyes",workspace)
 				local ChanceRolls = env._G.PlayerData.FamilyRolls
