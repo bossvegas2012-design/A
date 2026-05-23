@@ -3,13 +3,12 @@ local scriptCode = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/b
 if queue_on_teleport then
     queue_on_teleport(scriptCode)
 end
+task.wait(10)
 print("Suc")
 local Players = game:GetService("Players")
 
 -- รอจนกว่า LocalPlayer จะพร้อม
-local Player = Players.LocalPlayer 
-    or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
-    and Players.LocalPlayer
+local Player = Players.LocalPlayer
 local PlayerScripts = Player:WaitForChild("PlayerScripts")
 local env = getsenv(PlayerScripts.Client)
 
