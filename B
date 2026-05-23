@@ -4,8 +4,12 @@ if queue_on_teleport then
     queue_on_teleport(scriptCode)
 end
 print("Suc")
-local Players = game.Players
-local Player = Players.LocalPlayer
+local Players = game:GetService("Players")
+
+-- รอจนกว่า LocalPlayer จะพร้อม
+local Player = Players.LocalPlayer 
+    or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
+    and Players.LocalPlayer
 local PlayerScripts = Player:WaitForChild("PlayerScripts")
 local env = getsenv(PlayerScripts.Client)
 
