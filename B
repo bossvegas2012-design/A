@@ -6,7 +6,7 @@ end
 print("Suc")
 local Players = game.Players
 local Player = Players.LocalPlayer
-local PlayerScripts = Player:WaitForChild("PlayerScripts", 5)
+local PlayerScripts = Player:WaitForChild("PlayerScripts")
 local env = getsenv(PlayerScripts.Client)
 
 
