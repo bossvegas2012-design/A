@@ -1,9 +1,9 @@
 local scriptCode = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/B"))()'
-
+task.wait(10)
 if queue_on_teleport then
     queue_on_teleport(scriptCode)
 end
-task.wait(10)
+
 print("Suc")
 local Players = game:GetService("Players")
 
@@ -80,7 +80,7 @@ task.spawn(function()
 				local ChanceRolls = env._G.PlayerData.FamilyRolls
 				if ChanceRolls > 0 then
 					Rm_Sync:InvokeServer("Character","Customization","LastName")
-					task.wait(1)
+					task.wait(2)
 				else
 					Colletion:Rejoid()
 				end
@@ -88,7 +88,7 @@ task.spawn(function()
 				Rm_Sync:InvokeServer("Character","Customization","Eyes",1)
 			end
 		end)
-		task.wait(1)
+		task.wait(3)
 	end
 end)
 local VirtualUser = game:GetService("VirtualUser")
