@@ -5,6 +5,13 @@ if queue_on_teleport then
 end
 
 print("Suc")
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    print("AFK")
+	VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new(0,0))
+end)
+
 local Players = game:GetService("Players")
 
 -- รอจนกว่า LocalPlayer จะพร้อม
@@ -91,10 +98,4 @@ task.spawn(function()
 		end)
 		task.wait(3)
 	end
-end)
-local VirtualUser = game:GetService("VirtualUser")
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    print("AFK")
-	VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new(0,0))
 end)
