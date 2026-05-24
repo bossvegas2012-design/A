@@ -71,11 +71,12 @@ task.spawn(function()
 		pcall(function()
 			env._G.GameLoaded = true
 			local LastName = env._G.PlayerData.LastName
-            local localPlayer = game:GetService("Players").LocalPlayer
-            local username = localPlayer.Name 
-            local fileName = username .. ".log"
-			appendfile(fileName, LastName)
+            
 			if LastName ~= getgenv().RandomRolls.LastName then
+				local localPlayer = game:GetService("Players").LocalPlayer
+	            local username = localPlayer.Name 
+	            local fileName = username .. ".log"
+				appendfile(fileName, LastName)
 				Rm_Sync:InvokeServer("Character","Customization","Eyes",workspace)
 				local ChanceRolls = env._G.PlayerData.FamilyRolls
 				if ChanceRolls > 0 then
