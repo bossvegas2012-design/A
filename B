@@ -96,6 +96,6 @@ task.spawn(function()
 				Rm_Sync:InvokeServer("Character","Customization","Eyes",1)
 			end
 		end)
-		task.wait()
+		task.wait(3)
 	end
 end)
