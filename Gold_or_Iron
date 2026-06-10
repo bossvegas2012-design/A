@@ -1,6 +1,8 @@
-local scriptCode = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/ton"))()'
-task.wait(10)
 if queue_on_teleport then
-    queue_on_teleport(scriptCode)
+    queue_on_teleport([[
+        print("Running script after teleport!")
+        -- รันสคริปต์เดิมซ้ำอีกครั้ง เพื่อให้ทำงานข้ามเทเลพอร์ตได้เรื่อย ๆ
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/ton"))()
+    ]])
 end
 loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/ton"))()
