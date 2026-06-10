@@ -1,0 +1,522 @@
+local PlaceId = game.PlaceId
+local ServerJoid = 111579023868341
+
+if PlaceId == ServerJoid then
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local ModuleScript = require(ReplicatedStorage:WaitForChild("MatchmakingRemotes"):WaitForChild("ModuleScript"))
+    local v1 = ReplicatedStorage:WaitForChild(ModuleScript.REMOTES_FOLDER_NAME)
+    local RequestJoinByIndex = v1:WaitForChild("RequestJoinByIndex")
+    local ServerStatsPush = v1:WaitForChild("ServerStatsPush")
+
+    local GroupService = game:GetService("GroupService")
+    local TARGET_GROUP_ID = 398578541
+    local TARGET_ROLE_NAME = "AdminWhitelist"
+    local serverData = {}
+    local knownAdmins = {}
+    local hasJoined = false
+    local function isAdmin(userId)
+        if knownAdmins[userId] == true then return true end
+        if knownAdmins[userId] == false then return false end
+        local success, result = pcall(function()
+            return GroupService:GetGroupsAsync(userId)
+        end)
+        if success and result then
+            for _, groupInfo in pairs(result) do
+                if groupInfo.Id == TARGET_GROUP_ID and string.find(groupInfo.Role, TARGET_ROLE_NAME) then
+                    knownAdmins[userId] = true
+                    return true
+                end
+            end
+        end
+        knownAdmins[userId] = false
+        return false
+    end
+    local function findBestServer()
+        local bestIndex = nil
+        local bestCount = math.huge
+
+        for shardIndex, info in pairs(serverData) do
+            -- ข้ามห้องที่มี admin
+            if info.hasAdmin then continue end
+            -- ข้ามห้องที่เต็มแล้ว
+            if info.playerCount >= 50 then continue end
+
+            if info.playerCount < bestCount then
+                bestCount = info.playerCount
+                bestIndex = shardIndex
+            end
+        end
+
+        return bestIndex, bestCount
+    end
+    ServerStatsPush.OnClientEvent:Connect(function(data)
+        if data.placeId ~= ModuleScript.TARGET_PLACE_ID then return end
+
+        local shardIndex = tonumber(data.shardIndex)
+        if not shardIndex then return end
+        if not serverData[shardIndex] then
+            serverData[shardIndex] = { playerCount = 0, hasAdmin = false, players = {} }
+        end
+
+        local info = serverData[shardIndex]
+        info.playerCount = data.playerCount or 0
+        info.players = data.players or {}
+        info.hasAdmin = false
+        if data.players then
+            for _, userId in ipairs(data.players) do
+                local uid = tonumber(userId)
+                if uid then
+                    if knownAdmins[uid] == true then
+                        info.hasAdmin = true
+                    elseif knownAdmins[uid] == nil then
+                        task.spawn(function()
+                            if isAdmin(uid) then
+                                -- อัปเดตห้องนี้ว่ามี admin
+                                if serverData[shardIndex] then
+                                    serverData[shardIndex].hasAdmin = true
+                                end
+                            end
+                        end)
+                        task.wait(0.1) -- ป้องกัน 429
+                    end
+                end
+            end
+        end
+        local best, count = findBestServer()
+        if best then
+        end
+    end)
+    local function joinBestServer()
+        if hasJoined then return end
+        local bestIndex = findBestServer()
+        if not bestIndex then
+            return
+        end
+        hasJoined = true
+        local success, result = pcall(function()
+            return RequestJoinByIndex:InvokeServer(bestIndex)
+        end)
+        if success and result and result.ok then
+        else
+            hasJoined = false
+        end
+    end
+    task.delay(5, function()
+        joinBestServer()
+    end)
+    else
+    local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local FarmIron_CFrame = CFrame.new(-809.1336669921875, 3.2146315574645996, 5808.10791015625)
+local PROCESS_GOLD = CFrame.new(2623.34765625, 46.10975646972656, -1046.929931640625) * CFrame.new(0, -8, 0)
+local PROCESS_IRON = CFrame.new(2781.138671875, 46.04933166503906, -1134.3896484375) * CFrame.new(0, -8, 0)
+local PROCESS_IRONCFrame = PROCESS_IRON * CFrame.new(0, -8, 0)
+local Farm_Adjusted = FarmIron_CFrame * CFrame.new(0, -8, 0) -- ✅ ชื่อใหม่
+local PlayerGui = Player:WaitForChild("PlayerGui") -- แนะนำใช้ WaitForChild เพื่อป้องกัน UI ยังโหลดไม่เสร็จ
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local itemFolder = game:GetService("Players").LocalPlayer:WaitForChild("Item")
+local Collection = {}
+local ProcessingFolder = workspace:WaitForChild("Processing")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RemoteEventA = ReplicatedStorage:WaitForChild("RemoteEvent_Solf"):WaitForChild("RemoteEventA")
+local Crafttable = RemoteEventA:WaitForChild("CraftsFolder"):WaitForChild("Crafttable") -- คราฟตู้ 1,2,3 
+local Deposit = ReplicatedStorage:WaitForChild("Game_Modules"):WaitForChild("RemoteEventSafe"):WaitForChild("DepositItem")
+
+local camera = workspace.CurrentCamera
+local function LookUpInstant()
+    local character = Player.Character
+    local hrp = character and character:FindFirstChild("HumanoidRootPart")
+    
+    if hrp then
+        -- 1. เปลี่ยนโหมดกล้องให้สคริปต์ควบคุมได้
+        camera.CameraType = Enum.CameraType.Scriptable
+        
+        -- 2. ตั้งพิกัดกล้องให้อยู่ด้านหลังตัวละครเล็กน้อย และหันมองไปข้างหน้า
+        local baseCFrame = CFrame.new(hrp.Position + Vector3.new(0, 5, 10), hrp.Position)
+        
+        -- 3. สั่งหมุนมุมกล้องเงยขึ้นฟ้า (ใช้ math.rad ในการกำหนดองศา เช่น 45 หรือ 60 องศา)
+        camera.CFrame = baseCFrame * CFrame.Angles(math.rad(45), 0, 0)
+        
+        -- 4. คืนค่าการควบคุมกล้องให้ผู้เล่นตามปกติ (กล้องจะค้างอยู่ที่มุมใหม่นี้)
+        task.wait(0.1)
+        camera.CameraType = Enum.CameraType.Custom
+    end
+end
+-- ฟังก์ชันเช็คค่าที่ลื่นที่สุด
+function Collection:CheckIron()
+	local mineGold = itemFolder:WaitForChild("MineGold")
+	local mineIron = itemFolder:WaitForChild("MineIron")
+	local Iron = itemFolder:WaitForChild("Iron")
+	local Gold = itemFolder:WaitForChild("Gold")
+	local goldVal = mineGold.Value
+	local mineironVal = mineIron.Value
+	if Iron.Value ~= 500 then
+		if mineironVal ~= 500 then
+			return true
+		else
+			return false
+		end
+	end
+end
+
+function Collection:CheckGold()
+	local mineGold = itemFolder:WaitForChild("MineGold")
+	local Gold = itemFolder:WaitForChild("Gold")
+	local goldVal = mineGold.Value
+	if Gold.Value ~= 500 then
+		if goldVal ~= 500 then
+			return true
+		else
+			return false
+		end
+	end
+end
+
+
+
+local RunService = game:GetService("RunService")
+
+-- ประกาศ state ที่ไฟล์ต้น ไม่ใช่ global
+local isLocked1 = false
+local isLocked2 = false
+local lockConnection1 = nil
+local lockConnection2 = nil
+
+local function TP(targetTP)
+    local player = Players.LocalPlayer
+    if not player or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+
+    local hrp = player.Character.HumanoidRootPart
+    hrp.CFrame = targetTP
+
+    isLocked1 = true
+    isLocked2 = false
+
+    -- disconnect ของเก่าก่อนเสมอ
+    if lockConnection1 then
+        lockConnection1:Disconnect()
+        lockConnection1 = nil
+    end
+    if lockConnection2 then
+        lockConnection2:Disconnect()
+        lockConnection2 = nil
+    end
+
+    lockConnection1 = RunService.Heartbeat:Connect(function()
+        if not isLocked1 then return end
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = targetTP
+            char.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero  -- ใช้แทน .Velocity (deprecated)
+        end
+    end)
+end
+
+local function stopMove()
+    isLocked1 = false
+    isLocked2 = false
+
+    if lockConnection1 then
+        lockConnection1:Disconnect()
+        lockConnection1 = nil
+    end
+    if lockConnection2 then
+        lockConnection2:Disconnect()
+        lockConnection2 = nil
+    end
+end
+local GuiService = game:GetService("GuiService")
+function Collection:SelectedObjec(targetName)
+    local baseFrame = Player.PlayerGui.AutoMine.Frame.Frame_X
+   local targetButton = baseFrame:WaitForChild(targetName, 5)
+    if targetButton then
+        GuiService.SelectedObject = targetButton
+    else
+        warn("หาปุ่มที่ชื่อว่า " .. tostring(targetName) .. " ไม่เจอ")
+    end
+end
+
+
+function Collection:TriggerTargetPrompt(proximityPrompt)
+    if not proximityPrompt or not proximityPrompt:IsA("ProximityPrompt") then 
+        return 
+    end
+    if not proximityPrompt.Enabled then 
+        return 
+    end
+    
+    if fireproximityprompt then
+        -- วิธีปกติ: ถ้า Executor รองรับ ก็สั่งยิงฟังก์ชันตรงๆ (เร็วที่สุด)
+        fireproximityprompt(proximityPrompt)
+    else
+        -- วิธีสำรอง: ถ้าไม่รองรับ ให้จำลองการกดปุ่ม E ค้างไว้ 4 วินาที
+        warn("Executor ไม่รองรับฟังก์ชัน fireproximityprompt -> กำลังใช้วิธีกด E ค้าง 4 วินาทีแทน")
+        
+        task.spawn(function()
+            -- 1. ส่งสัญญาณว่า "กดปุ่ม E ลงไป" (KeyDown)
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, game)
+            
+            -- 2. รอค้างไว้เป็นเวลา 4 วินาทีตามที่กำหนด
+            task.wait(4)
+            
+            -- 3. ส่งสัญญาณว่า "ปล่อยปุ่ม E" (KeyUp)
+            VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, game)
+        end)
+    end
+end
+function Collection:CheckFarm()
+    local Char = Player.Character or Player.CharacterAdded:Wait()
+    local Auto = Char:FindFirstChild("Auto")
+    if Auto and Auto.Value then
+        return true
+    else
+        return false
+    end
+end
+
+
+function Collection:simulateEnterThenBackslash()
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Return, false, game)
+    task.wait(0.05)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Return, false, game)
+    task.wait(0.05) 
+    VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.BackSlash, false, game)
+    task.wait(0.05)
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.BackSlash, false, game)
+end
+getgenv().FarmIron = false
+getgenv().FarmGold = true
+-- getgenv().Farmming = true
+-- getgenv().Process = false
+
+
+
+
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        pcall(function()
+            if FarmGold then
+                local StoneGold = ProcessingFolder:FindFirstChild("StoneGold")
+                local GoldProcessingPart = StoneGold:FindFirstChild("Procressing")
+                local character = Player.Character
+                local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+                local AutoMine = PlayerGui:FindFirstChild("AutoMine")
+                local StatusFarm = Collection:CheckFarm()
+                local CheckGold = Collection:CheckGold()
+                if CheckGold then
+                    TP(Farm_Adjusted)
+                    if rootPart then
+                        local distance = (rootPart.Position - Farm_Adjusted.Position).Magnitude
+                        if distance < 10 then
+                            if not AutoMine.Enabled and not StatusFarm then
+                                LookUpInstant()
+                                local TargetPromxim = workspace.Farm.MineIron.area:FindFirstChild("Position").ProximityPrompt
+								Collection:TriggerTargetPrompt(TargetPromxim)
+                            else 
+                                if not StatusFarm then
+                                    Collection:SelectedObjec("MineGold")
+									Collection:simulateEnterThenBackslash()
+                                end
+                            end
+                        end
+                    end
+                else
+                    TP(PROCESS_GOLD)
+                    local distance = (rootPart.Position - PROCESS_GOLD.Position).Magnitude
+                    if distance < 10 then
+                        local ProcessGoldPrompt = GoldProcessingPart:FindFirstChild("Part"):FindFirstChild("ProximityPrompt")
+                        if ProcessGoldPrompt then
+                            Collection:TriggerTargetPrompt(ProcessGoldPrompt)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        pcall(function()
+            if FarmIron then
+                local StoneIron = ProcessingFolder:FindFirstChild("StoneIron")
+                local IronProcessingPart = StoneIron:FindFirstChild("Procressing")
+                local character = Player.Character
+                local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+                local AutoMine = PlayerGui:FindFirstChild("AutoMine")
+                local StatusFarm = Collection:CheckFarm()
+                local CheckIron = Collection:CheckIron()
+                if CheckIron then
+                    TP(Farm_Adjusted)
+                    if rootPart then
+                        local distance = (rootPart.Position - Farm_Adjusted.Position).Magnitude
+                        if distance < 10 then
+                            if not AutoMine.Enabled and not StatusFarm then
+                            LookUpInstant()
+                                local TargetPromxim = workspace.Farm.MineIron.area:FindFirstChild("Position").ProximityPrompt
+								Collection:TriggerTargetPrompt(TargetPromxim)
+                            else 
+                                if not StatusFarm then
+                                    Collection:SelectedObjec("MineIron")
+									Collection:simulateEnterThenBackslash()
+                                end
+                            end
+                        end
+                    end
+                else
+                    TP(PROCESS_IRON)
+                    local distance = (rootPart.Position - PROCESS_IRON.Position).Magnitude
+                    if distance < 10 then
+                        local ProcessIronPrompt = IronProcessingPart:FindFirstChild("Part"):FindFirstChild("ProximityPrompt")
+                        if ProcessIronPrompt then
+                            Collection:TriggerTargetPrompt(ProcessIronPrompt)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
+
+
+
+
+local function DepositToSafe(itemName,Amount) -- เก็บใส่ตู้
+	Deposit:FireServer(itemName, Amount)
+end
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+		pcall(function()
+			local Iron = itemFolder:WaitForChild("Iron")
+			local Gold = itemFolder:WaitForChild("Gold")
+			if FarmIron then
+				if Iron.Value == 500  then
+					DepositToSafe("Iron", 500)
+				end
+			elseif FarmGold then
+				if Gold.Value == 500 then
+					DepositToSafe("Gold", 500)
+				end
+			end
+		end)
+    end
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local FreezeRemote = ReplicatedStorage:WaitForChild("RemotesProcessing"):WaitForChild("Freeze")
+
+-- ดักจับคำสั่งจากเซิร์ฟเวอร์ และทำการ "เมิน" (Return ทิ้งไปเลย ไม่ต้องรันโค้ดแช่แข็ง)
+FreezeRemote.OnClientInvoke = function(action)
+    print("[🛡️ Anti-Freeze]: บล็อคคำสั่ง " .. tostring(action) .. " จากเซิร์ฟเวอร์เรียบร้อย!")
+    return true -- ส่งค่ากลับไปหลอกเซิร์ฟเวอร์ว่าทำงานเสร็จแล้ว แต่จริงๆ เราไม่ได้ทำอะไรเลย
+end
+
+
+bb=game:service'VirtualUser'
+	game:service'Players'.LocalPlayer.Idled:connect(function()
+		print("Anti Afk")
+	bb:CaptureController()bb:ClickButton2(Vector2.new())
+end)
+
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Player = Players.LocalPlayer
+
+-- เก็บตัวแปรไว้ด้านบนหมด
+local c = Player:WaitForChild("PlayerGui")
+            :WaitForChild("Backpack_Never")
+            :WaitForChild("Check")
+
+local BagRemote = ReplicatedStorage
+    :WaitForChild("RemoteEvent_Solf")
+    :WaitForChild("RemoteEventA")
+    :WaitForChild("Bag")
+
+local function CheckStats()
+    local DataStats = Player:WaitForChild("DataStats", 5)
+    if not DataStats then return end
+
+    local ThirstVal = DataStats:FindFirstChild("ThirstVal")
+    local HungerVal = DataStats:FindFirstChild("HungerVal")
+
+    if not (ThirstVal and HungerVal) then return end
+
+    local hold = c:FindFirstChild("hold")
+    local delay = c:FindFirstChild("delay")
+
+    if not (hold and delay) then return end  -- ป้องกัน error ถ้าหา hold/delay ไม่เจอ
+
+    if ThirstVal.Value < 20 then
+        BagRemote:FireServer("Use", "Watermelon", hold, delay)
+        print("กินน้ำ")
+    elseif HungerVal.Value < 20 then
+        BagRemote:FireServer("Use", "Kimji", hold, delay)
+        print("กินข้าว")
+    end
+end
+
+_G.Farm = true
+task.spawn(function()
+	while true do
+	    task.wait(60)
+		if _G.Farm then
+			pcall(function()
+                CheckStats()
+            end)
+        end
+    end
+end)
+
+
+
+local Players = game:GetService("Players")
+
+local function checkPlayer(player)
+    -- ฟังก์ชันเช็คสถานะแอดมิน
+    if player:GetAttribute("IsAdmin") == true then
+        print("🚨 [EVENT DETECTED] เจอแอดมิน!: " .. player.Name .. " (@" .. player.DisplayName .. ")")
+        local ts = game:GetService("TeleportService")
+
+        local p = game:GetService("Players").LocalPlayer
+
+        
+
+        ts:Teleport(111579023868341, p)
+    end
+end
+
+-- 1. เช็คแอดมินสำหรับคนที่อยู่ในเซิร์ฟเวอร์อยู่แล้วตอนสคริปต์เริ่มรัน
+for _, player in ipairs(Players:GetPlayers()) do
+    checkPlayer(player)
+    
+    -- ดักฟังเผื่อว่าคนในเซิร์ฟเวอร์เพิ่งโดนเปลี่ยนยศทีหลัง
+    player:GetAttributeChangedSignal("IsAdmin"):Connect(function()
+        checkPlayer(player)
+    end)
+end
+
+-- 2. ดักฟังเมื่อมีผู้เล่นใหม่ "เพิ่งโหลดเข้าเซิร์ฟเวอร์มา"
+Players.PlayerAdded:Connect(function(player)
+    -- ดักฟังเผื่อตอนเข้าเกมมาแล้วยศยังไม่โหลด แล้วมาเปลี่ยนทีหลัง
+    player:GetAttributeChangedSignal("IsAdmin"):Connect(function()
+        checkPlayer(player)
+    end)
+end)
+
+print("--- ระบบดักจับแอดมินแบบ Event พร้อมทำงาน (Lag-Free) ---")
+end
+
+
+
+
+
+
